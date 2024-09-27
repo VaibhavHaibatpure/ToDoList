@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Navbar, Modal, Form } from 'react-bootstrap';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 import Api from '../services/TaskService'; // Ensure the correct path to your API service
 
 const Taskbar = ({ onRefreshClick, onTaskSubmit }) => {
   // State to control the visibility of the modal
   const [isModalVisible, setIsModalVisible] = useState(false);
-  
+
   // State to hold task details
   const [taskDetails, setTaskDetails] = useState({
     assignedTo: '',
@@ -61,7 +60,15 @@ const Taskbar = ({ onRefreshClick, onTaskSubmit }) => {
       {/* Navigation bar containing task options */}
       <Navbar bg="light" className="justify-content-between">
         <Navbar.Brand>
-          <i className="bi bi-list-ul"></i> Tasks
+          {/* Use custom image instead of icon */}
+          <img
+            src={`${process.env.PUBLIC_URL}/todolist.png`}
+            alt="To Do List"
+            width="30"
+            height="30"
+            className="d-inline-block align-top"
+          />
+          {' '}Tasks
         </Navbar.Brand>
         <div>
           {/* Button to create a new task */}

@@ -13,6 +13,7 @@ const DeleteModal = ({ task, onClose, onConfirm }) => {
         <p>Assigned to :"{task?.assignedTo}" </p>
         <p>Status :"{task?.status}"</p>
       </Modal.Body>
+      
       <Modal.Footer>
         <Button variant="secondary" onClick={onClose}>No</Button>
         <Button variant="danger" onClick={onConfirm}>Yes</Button>

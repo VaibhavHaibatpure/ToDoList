@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { Table, Button, Pagination } from 'react-bootstrap';
 
-const TaskTable = ({ tasks, onEdit, onDelete }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+const TaskTable = ({ tasks, onEdit, onDelete }) => { // Change here
+  const [activePage, setActivePage] = useState(1);
   const tasksPerPage = 15;
 
-  // Calculate total number of pages
+  // Calculate total pages required
   const totalPages = Math.ceil(tasks.length / tasksPerPage);
 
-  // Calculate the tasks to display for the current page
-  const indexOfLastTask = currentPage * tasksPerPage;
-  const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-  const currentTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
+  // Get the current tasks to be displayed
+  const startIndex = (activePage - 1) * tasksPerPage;
+  const currentTaskBatch = tasks.slice(startIndex, startIndex + tasksPerPage);
 
-  // Handle page change
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  // Update the page number
+  const switchPage = (pageNumber) => {
+    setActivePage(pageNumber);
   };
 
   return (
@@ -33,7 +32,7 @@ const TaskTable = ({ tasks, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {currentTasks.map((task) => (
+          {currentTaskBatch.map((task) => (
             <tr key={task.id}>
               <td>{task.id}</td>
               <td>{task.assignedTo}</td>
@@ -42,32 +41,32 @@ const TaskTable = ({ tasks, onEdit, onDelete }) => {
               <td>{task.priority}</td>
               <td>{task.comments}</td>
               <td>
-                <Button variant="warning" onClick={() => onEdit(task)}>Edit</Button>
-                <Button variant="danger" onClick={() => onDelete(task)} className="ms-2">Delete</Button>
+                <Button variant="warning" onClick={() => onEdit(task)}>Edit</Button> {/* Change here */}
+                <Button variant="danger" onClick={() => onDelete(task)} className="ms-2">Delete</Button> {/* Change here */}
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
 
-      {/* Pagination Controls */}
+      {/* Pagination controls */}
       <Pagination>
         <Pagination.Prev 
-          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)} 
-          disabled={currentPage === 1} 
+          onClick={() => activePage > 1 && switchPage(activePage - 1)} 
+          disabled={activePage === 1} 
         />
         {[...Array(totalPages)].map((_, index) => (
           <Pagination.Item 
             key={index + 1} 
-            active={index + 1 === currentPage} 
-            onClick={() => handlePageChange(index + 1)}
+            active={index + 1 === activePage} 
+            onClick={() => switchPage(index + 1)}
           >
             {index + 1}
           </Pagination.Item>
         ))}
         <Pagination.Next 
-          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)} 
-          disabled={currentPage === totalPages} 
+          onClick={() => activePage < totalPages && switchPage(activePage + 1)} 
+          disabled={activePage === totalPages} 
         />
       </Pagination>
     </>

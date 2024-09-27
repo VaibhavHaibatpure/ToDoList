@@ -2,93 +2,92 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Taskbar from './components/Taskbar';
 import TaskTable from './components/TaskTable';
-import TaskDetailModal from './components/TaskDetailModal'; 
-import DeleteModal from './components/DeleteModal'; 
-import Api from './services/TaskService'; 
+import TaskDetailModal from './components/TaskDetailModal';
+import DeleteModal from './components/DeleteModal';
+import TaskService from './services/TaskService';
 
 const App = () => {
-  const [tasks, setTasks] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [taskList, setTaskList] = useState([]);
+  const [currentTask, setCurrentTask] = useState(null);
+  const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   useEffect(() => {
-    fetchTasks();
+    loadTasks();
   }, []);
 
-  const fetchTasks = async () => {
+  const loadTasks = async () => {
     try {
-      const response = await Api.getAllTasks();
-      setTasks(response.data);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
+      const response = await TaskService.getAllTasks();
+      setTaskList(response.data);
+    } catch (err) {
+      console.error('Error loading tasks:', err);
     }
   };
 
-  const handleNewTaskClick = () => {
-    setSelectedTask(null);
-    setShowTaskModal(true);
+  const addNewTask = () => {
+    setCurrentTask(null);  // Reset the task form for new task creation
+    setIsTaskModalVisible(true);  // Show task modal for creating new task
   };
 
-  const handleEditTask = (task) => {
-    setSelectedTask(task);
-    setShowTaskModal(true);
-  };
-
-  const handleDeleteTask = (task) => {
-    setSelectedTask(task);
-    setShowDeleteModal(true);
-  };
-
-  const handleRefresh = () => {
-    fetchTasks();
-  };
-
-  const handleTaskSubmit = async (task) => {
+  const saveNewTask = async (taskDetails) => {
     try {
-      if (selectedTask) {
-        await Api.updateTask(selectedTask.id, task);
-      } else {
-        await Api.createTask(task);
-      }
-      fetchTasks();
-      setShowTaskModal(false);
-    } catch (error) {
-      console.error("Error saving task:", error);
+      // Create new task by calling the TaskService
+      await TaskService.createTask(taskDetails);
+      // Reload the task list to show the newly created task
+      loadTasks();
+      // Close the task modal after saving
+      setIsTaskModalVisible(false);
+    } catch (err) {
+      console.error('Error creating task:', err);
     }
   };
 
-  const handleTaskDelete = async () => {
+  const editTask = (task) => {
+    setCurrentTask(task);  // Set task to edit
+    setIsTaskModalVisible(true);  // Open modal to edit the task
+  };
+
+  const deleteTaskPrompt = (task) => {
+    setCurrentTask(task);  // Set current task to delete
+    setIsDeleteModalVisible(true);  // Open delete confirmation modal
+  };
+
+  const confirmTaskDelete = async () => {
     try {
-      await Api.deleteTask(selectedTask.id);
-      fetchTasks();
-      setShowDeleteModal(false);
-    } catch (error) {
-      console.error("Error deleting task:", error);
+      // Delete the task using the TaskService
+      await TaskService.deleteTask(currentTask.id);
+      // Reload task list after deletion
+      loadTasks();
+      // Close delete confirmation modal
+      setIsDeleteModalVisible(false);
+    } catch (err) {
+      console.error('Error deleting task:', err);
     }
   };
 
   return (
     <div>
-      <Taskbar onRefreshClick={handleRefresh} onTaskSubmit={handleTaskSubmit} />
+      {/* Pass saveNewTask to Taskbar for creating a new task */}
+      <Taskbar onRefreshClick={loadTasks} onTaskSubmit={saveNewTask} /> 
       <div className="container mt-3">
-        <TaskTable tasks={tasks} onEdit={handleEditTask} onDelete={handleDeleteTask} />
+        <TaskTable tasks={taskList} onEdit={editTask} onDelete={deleteTaskPrompt} />
       </div>
 
-      {showTaskModal && (
+      {isTaskModalVisible && (
         <TaskDetailModal
-          task={selectedTask}
-          show={showTaskModal}
-          onHide={() => setShowTaskModal(false)}
-          onSave={handleTaskSubmit}
+          task={currentTask}
+          show={isTaskModalVisible}
+          onHide={() => setIsTaskModalVisible(false)}
+          onSave={saveNewTask}  // Pass saveNewTask to modal for saving task
         />
       )}
 
-      {showDeleteModal && (
+      {isDeleteModalVisible && (
         <DeleteModal
-          task={selectedTask}
-          onClose={() => setShowDeleteModal(false)}
-          onConfirm={handleTaskDelete}
+          task={currentTask}
+          onClose={() => setIsDeleteModalVisible(false)}
+          onConfirm={confirmTaskDelete}  // Confirm task deletion
         />
       )}
     </div>

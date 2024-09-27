@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const Api = 'http://localhost:8282/tasks'; 
 
+
 const getAllTasks = () => {
     return axios.get(Api);
 };
@@ -9,7 +10,7 @@ const getAllTasks = () => {
 const getTaskById = (id) => {
     return axios.get(`${Api}/${id}`);
 };
-
+    
 const createTask = (task) => {
     return axios.post(Api, task);
 };

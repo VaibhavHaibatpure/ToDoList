@@ -8,7 +8,10 @@ const DeleteModal = ({ task, onClose, onConfirm }) => {
         <Modal.Title>Confirm Deletion</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Do you want to delete the task "{task?.title}"?</p>
+        <p>Do you want to delete the task ?</p>
+        <p>ID:"{task?.id }" </p>
+        <p>Assigned to :"{task?.assignedTo}" </p>
+        <p>Status :"{task?.status}"</p>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onClose}>No</Button>
